@@ -11,7 +11,11 @@
 # Version: 1.0
 # MinDropzoneVersion: 3.5
 
+from subprocess import call
 import time
+import os
+
+NODE_BIN_PATH = '/usr/local/bin'
 
 def dragged():
     # Welcome to the Dropzone 3 API! It helps to know a little Python before playing in here.
@@ -35,14 +39,18 @@ def dragged():
     dz.begin("Starting some task...")
 
     # Below line switches the progress display to determinate mode so we can show progress
-    dz.determinate(True)
+    dz.determinate(False)
 
-    # Below lines tell Dropzone to update the progress bar display
-    dz.percent(10)
-    time.sleep(1)
-    dz.percent(50)
-    time.sleep(1)
-    dz.percent(100)
+    for file in items:
+        env = {'PATH': os.environ['PATH'] + ':' + NODE_BIN_PATH}
+        
+        # Overwrites the file
+        call(['svgo', file], env=env)
+
+        # Makes a new file
+        call(['svg-to-jsx', file, '-o', file + '.js'], env=env)
+
+    # dz.percent(100)
 
     # The below line tells Dropzone to end with a notification center notification with the text "Task Complete"
     dz.finish("Task Complete")
